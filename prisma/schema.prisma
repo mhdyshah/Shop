@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @unique @default(autoincrement())
+  email     String     @unique
+  hash      String
+  phone     Int        @unique
+  fullName  String?
+  address   String?
+  isAdmin   Boolean    @default(false)
+  role      Role       @default(USER)
+  createdAt DateTime   @default(now())
+  createdBy String     @default("ADMIN")
+  updatedAt DateTime?  @updatedAt
+  updatedBy String?    @default("ADMIN")
+  deletedAt DateTime?
+  deletedBy String?
+  scores    Int?
+  authCode  Int?
+  Category  Category[]
+  Product   Product[]
+}
+
+model Category {
+  id        Int       @id @unique @default(autoincrement())
+  title     String    @unique
+  createdAt DateTime  @default(now())
+  createdBy String    @default("ADMIN")
+  updatedAt DateTime? @updatedAt
+  updatedBy String?   @default("ADMIN")
+  deletedAt DateTime?
+  deletedBy String?
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  Product   Product[]
+}
+
+model Product {
+  id          Int       @id @unique @default(autoincrement())
+  title       String
+  description String
+  price       Int       @default(0)
+  imageLink   String
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  status      Status    @default(AVAILABLE)
+  createdAt   DateTime  @default(now())
+  createdBy   String    @default("ADMIN")
+  updatedAt   DateTime? @updatedAt
+  updatedBy   String?   @default("ADMIN")
+  deletedAt   DateTime?
+  deletedBy   String?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Status {
+  AVAILABLE
+  UNAVAILABLE
+}
